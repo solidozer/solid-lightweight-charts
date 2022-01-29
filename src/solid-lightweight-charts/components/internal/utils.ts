@@ -16,6 +16,7 @@ export function useSeriesEffect<T extends SeriesParams>(
 
     onMount(() => {
         const [{...params}, ref] = callback();
+        console.log('series mount')
         subject = series(api, params);
         subject.updateReference(ref);
     });
