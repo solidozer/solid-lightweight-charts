@@ -5,6 +5,11 @@ import {LineStyle, SeriesType} from 'lightweight-charts';
 import {Chart} from './solid-lightweight-charts/components/chart';
 import {LineSeries} from './solid-lightweight-charts/components/line-series';
 import {PriceLine} from './solid-lightweight-charts/components/price-line';
+import {BarSeries} from './solid-lightweight-charts/components/bar-series';
+import {CandlestickSeries} from './solid-lightweight-charts/components/candlestick-series';
+import {AreaSeries} from './solid-lightweight-charts/components/area-series';
+import {BaselineSeries} from './solid-lightweight-charts/components/baseline-series';
+import {HistogramSeries} from './solid-lightweight-charts/components/histogram-series';
 
 export function App() {
     const [height, setHeight] = createSignal(400);
@@ -134,7 +139,7 @@ export function App() {
 
             <Show when={active()}>
                 <Chart height={height()} width={width()}>
-                    {type() === 'Line' ? (
+                    {type() === 'Line' && (
                         <LineSeries
                             color={color()}
                             data={[
@@ -161,7 +166,145 @@ export function App() {
                                 />
                             </Show>
                         </LineSeries>
-                    ) : undefined}
+                    )}
+
+                    {type() === 'Area' && (
+                        <AreaSeries
+                            data={[
+                                {time: '2019-04-11', value: 80.01},
+                                {time: '2019-04-12', value: 96.63},
+                                {time: '2019-04-13', value: 76.64},
+                                {time: '2019-04-14', value: 81.89},
+                                {time: '2019-04-15', value: 74.43},
+                                {time: '2019-04-16', value: 80.01},
+                                {time: '2019-04-17', value: 96.63},
+                                {time: '2019-04-18', value: 76.64},
+                                {time: '2019-04-19', value: 81.89},
+                                {time: '2019-04-20', value: 74.43},
+                            ]}
+                        >
+                            <Show when={line()}>
+                                <PriceLine
+                                    price={80}
+                                    color="#FF0000"
+                                    lineWidth={1}
+                                    lineStyle={LineStyle.Solid}
+                                    axisLabelVisible={true}
+                                    title="price"
+                                />
+                            </Show>
+                        </AreaSeries>
+                    )}
+
+                    {type() === 'Histogram' && (
+                        <HistogramSeries
+                            data={[
+                                {time: '2019-04-11', value: 80.01},
+                                {time: '2019-04-12', value: 96.63},
+                                {time: '2019-04-13', value: 76.64},
+                                {time: '2019-04-14', value: 81.89},
+                                {time: '2019-04-15', value: 74.43},
+                                {time: '2019-04-16', value: 80.01},
+                                {time: '2019-04-17', value: 96.63},
+                                {time: '2019-04-18', value: 76.64},
+                                {time: '2019-04-19', value: 81.89},
+                                {time: '2019-04-20', value: 74.43},
+                            ]}
+                        >
+                            <Show when={line()}>
+                                <PriceLine
+                                    price={80}
+                                    color="#FF0000"
+                                    lineWidth={1}
+                                    lineStyle={LineStyle.Solid}
+                                    axisLabelVisible={true}
+                                    title="price"
+                                />
+                            </Show>
+                        </HistogramSeries>
+                    )}
+
+                    {type() === 'Baseline' && (
+                        <BaselineSeries
+                            baseValue={{
+                                type: 'price',
+                                price: 85,
+                            }}
+                            data={[
+                                {time: '2019-04-11', value: 80.01},
+                                {time: '2019-04-12', value: 96.63},
+                                {time: '2019-04-13', value: 76.64},
+                                {time: '2019-04-14', value: 81.89},
+                                {time: '2019-04-15', value: 74.43},
+                                {time: '2019-04-16', value: 80.01},
+                                {time: '2019-04-17', value: 96.63},
+                                {time: '2019-04-18', value: 76.64},
+                                {time: '2019-04-19', value: 81.89},
+                                {time: '2019-04-20', value: 74.43},
+                            ]}
+                        >
+                            <Show when={line()}>
+                                <PriceLine
+                                    price={80}
+                                    color="#FF0000"
+                                    lineWidth={1}
+                                    lineStyle={LineStyle.Solid}
+                                    axisLabelVisible={true}
+                                    title="price"
+                                />
+                            </Show>
+                        </BaselineSeries>
+                    )}
+
+                    {type() === 'Bar' && (
+                        <BarSeries
+                            data={[
+                                {time: '2018-10-19', open: 180.34, high: 180.99, low: 178.57, close: 179.85},
+                                {time: '2018-10-22', open: 180.82, high: 181.40, low: 177.56, close: 178.75},
+                                {time: '2018-10-23', open: 175.77, high: 179.49, low: 175.44, close: 178.53},
+                                {time: '2018-10-24', open: 178.58, high: 182.37, low: 176.31, close: 176.97},
+                                {time: '2018-10-25', open: 177.52, high: 180.50, low: 176.83, close: 179.07},
+                                {time: '2018-10-26', open: 176.88, high: 177.34, low: 170.91, close: 172.23},
+                                {time: '2018-10-29', open: 173.74, high: 175.99, low: 170.95, close: 173.20},
+                            ]}
+                        >
+                            <Show when={line()}>
+                                <PriceLine
+                                    price={178}
+                                    color="#FF0000"
+                                    lineWidth={1}
+                                    lineStyle={LineStyle.Solid}
+                                    axisLabelVisible={true}
+                                    title="price"
+                                />
+                            </Show>
+                        </BarSeries>
+                    )}
+
+                    {type() === 'Candlestick' && (
+                        <CandlestickSeries
+                            data={[
+                                {time: '2018-10-19', open: 180.34, high: 180.99, low: 178.57, close: 179.85},
+                                {time: '2018-10-22', open: 180.82, high: 181.40, low: 177.56, close: 178.75},
+                                {time: '2018-10-23', open: 175.77, high: 179.49, low: 175.44, close: 178.53},
+                                {time: '2018-10-24', open: 178.58, high: 182.37, low: 176.31, close: 176.97},
+                                {time: '2018-10-25', open: 177.52, high: 180.50, low: 176.83, close: 179.07},
+                                {time: '2018-10-26', open: 176.88, high: 177.34, low: 170.91, close: 172.23},
+                                {time: '2018-10-29', open: 173.74, high: 175.99, low: 170.95, close: 173.20},
+                            ]}
+                        >
+                            <Show when={line()}>
+                                <PriceLine
+                                    price={178}
+                                    color="#FF0000"
+                                    lineWidth={1}
+                                    lineStyle={LineStyle.Solid}
+                                    axisLabelVisible={true}
+                                    title="price"
+                                />
+                            </Show>
+                        </CandlestickSeries>
+                    )}
                 </Chart>
             </Show>
         </>
