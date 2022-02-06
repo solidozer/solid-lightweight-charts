@@ -18,6 +18,11 @@ export function App() {
     const [color, setColor] = createSignal('#0000FF');
     const [line, setLine] = createSignal(false);
     const [type, setType] = createSignal<SeriesType>('Line');
+    const [time, setTime] = createSignal('');
+    const [price, setPrice] = createSignal('');
+    const [point, setPoint] = createSignal('');
+    const [trackHover, setTrackHover] = createSignal(true);
+    const [trackClick, setTrackClick] = createSignal(true);
 
     return (
         <>
@@ -136,9 +141,52 @@ export function App() {
                     /> - Bar
                 </label>
             </fieldset>
-
+            <fieldset>
+                <legend>Crosshair:</legend>
+                <label>Track: <input type="checkbox" name="tack-hover" checked={trackHover()} onChange={(e) => setTrackHover(e.currentTarget.checked)}/></label>
+                <br/>
+                Time: {time()}
+                <br/>
+                Price: {price()}
+            </fieldset>
+            <fieldset>
+                <legend>Click:</legend>
+                <label>Track: <input type="checkbox" name="tack-click" checked={trackClick()} onChange={(e) => setTrackClick(e.currentTarget.checked)}/></label>
+                <br/>
+                Point: {point()}
+            </fieldset>
             <Show when={active()}>
-                <Chart height={height()} width={width()}>
+                <Chart
+                    height={height()}
+                    width={width()}
+                    onCrosshairMove={trackHover() ? (params) => {
+                        if (typeof params.time === 'undefined') {
+                            setTime('');
+                        }
+                        if (typeof params.time === 'object') {
+                            const date = new Date(params.time.year, params.time.month, params.time.day);
+                            setTime(date.toDateString());
+                        }
+                        if (typeof params.time === 'number') {
+                            const date = new Date(params.time / 1000);
+                            setTime(date.toDateString());
+                        }
+
+                        const [value] = params.seriesPrices.values();
+                        if (typeof value === 'undefined') {
+                            setPrice('');
+                        }
+                        if (typeof value === 'number') {
+                            setPrice(value.toFixed(2));
+                        }
+                        if (typeof value === 'object') {
+                            setPrice(`O: ${value.open} H: ${value.high} L: ${value.low} C: ${value.close}`);
+                        }
+                    } : undefined}
+                    onClick={trackClick() ? (params) => {
+                        setPoint(`X - ${params.point?.x ?? ''} Y - ${params.point?.y ?? ''}`)
+                    } : undefined}
+                >
                     {type() === 'Line' && (
                         <LineSeries
                             color={color()}

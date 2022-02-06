@@ -1,26 +1,73 @@
 import type {JSX} from 'solid-js/jsx-runtime';
-import {ChartOptions, createChart, DeepPartial, IChartApi} from 'lightweight-charts';
+import {ChartOptions, createChart, DeepPartial, IChartApi, MouseEventHandler} from 'lightweight-charts';
 import {createSignal, splitProps, Show, onMount, createEffect, onCleanup} from 'solid-js';
 
 import {ApiProvider} from './internal/context';
+import {Reference} from '../types';
 
-export interface ChartProps extends DeepPartial<ChartOptions> {
+export interface ChartProps extends ChartActionParams {
     children?: JSX.Element;
 }
 
 export function Chart(props: ChartProps): JSX.Element {
     const [api, setApi] = createSignal<IChartApi | null>(null);
-    const [, options] = splitProps(props, ['children']);
+    const [, params] = splitProps(props, ['children']);
 
     return (
         <>
             <div use:action={[
-                (element: HTMLElement, params: DeepPartial<ChartOptions>) => {
-                    const subject = createChart(element, params);
+                (element: HTMLElement, params: ChartActionParams) => {
+                    let {onClick, onCrosshairMove, ref, ...options} = params;
+                    const subject = createChart(element, options);
+
+                    if (onClick) {
+                        subject.subscribeClick(onClick);
+                    }
+                    if (onCrosshairMove) {
+                        subject.subscribeCrosshairMove(onCrosshairMove);
+                    }
+
+                    if (ref) {
+                        ref(subject);
+                    }
+
                     setApi(subject);
                     return {
-                        update(nextParams: DeepPartial<ChartOptions>): void {
-                            subject.applyOptions(nextParams);
+                        update(nextParams: ChartActionParams): void {
+                            const {
+                                ref: nextRef,
+                                onClick: nextOnClick,
+                                onCrosshairMove: nextOnCrosshairMove,
+                                ...nextOptions
+                            } = nextParams;
+
+                            if (nextRef !== ref) {
+                                ref?.(null);
+                                ref = nextRef;
+                                ref?.(subject);
+                            }
+
+                            subject.applyOptions(nextOptions);
+
+                            if (nextOnClick !== onClick) {
+                                if (onClick) {
+                                    subject.unsubscribeClick(onClick);
+                                }
+                                onClick = nextOnClick;
+                                if (onClick) {
+                                    subject.subscribeClick(onClick);
+                                }
+                            }
+
+                            if (nextOnCrosshairMove !== onCrosshairMove) {
+                                if (onCrosshairMove) {
+                                    subject.unsubscribeCrosshairMove(onCrosshairMove);
+                                }
+                                onCrosshairMove = nextOnCrosshairMove;
+                                if (onCrosshairMove) {
+                                    subject.subscribeCrosshairMove(onCrosshairMove);
+                                }
+                            }
                         },
                         destroy(): void {
                             subject.remove();
@@ -28,7 +75,7 @@ export function Chart(props: ChartProps): JSX.Element {
                         }
                     };
                 },
-                options,
+                params,
             ]}/>
             {/*
                 It is important to keep fake nodes as siblings of DIV
@@ -54,33 +101,38 @@ declare module 'solid-js' {
     namespace JSX {
         interface Directives {
             action: [
-                (element: HTMLElement, params: DeepPartial<ChartOptions>) => {
-                    update(nextParams: DeepPartial<ChartOptions>): void;
+                (element: HTMLElement, params: ChartActionParams) => {
+                    update(nextParams: ChartActionParams): void;
                     destroy(): void;
                 },
-                DeepPartial<ChartOptions>,
+                ChartActionParams,
             ]
         }
     }
 }
 
+interface ChartActionParams extends DeepPartial<ChartOptions>{
+    ref?: Reference<IChartApi>;
+    onClick?: MouseEventHandler;
+    onCrosshairMove?: MouseEventHandler;
+}
+
 function action(
     element: HTMLElement,
     accessor: () => [
-        (element: HTMLElement, params: DeepPartial<ChartOptions>) => {
-            update(nextParams: DeepPartial<ChartOptions>): void;
+        (element: HTMLElement, params: ChartActionParams) => {
+            update(nextParams: ChartActionParams): void;
             destroy(): void;
         },
         DeepPartial<ChartOptions>,
     ]
 ): void {
     let action: {
-        update(nextParams: DeepPartial<ChartOptions>): void;
+        update(nextParams: ChartActionParams): void;
         destroy(): void;
     }
 
     onMount(() => {
-        console.log('chart init');
         const [fn, params] = accessor();
         action = fn(element, {...params});
     });
