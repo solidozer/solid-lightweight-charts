@@ -1,5 +1,5 @@
 import {render} from 'solid-js/web';
-import {createSignal, Show, Switch, Match} from 'solid-js';
+import {createSignal, Show} from 'solid-js';
 import {LineStyle, SeriesType} from 'lightweight-charts';
 
 import {Chart} from './solid-lightweight-charts/components/chart';
@@ -134,7 +134,7 @@ export function App() {
 
             <Show when={active()}>
                 <Chart height={height()} width={width()}>
-                    {type() === 'Line' && (
+                    {type() === 'Line' ? (
                         <LineSeries
                             color={color()}
                             data={[
@@ -161,7 +161,7 @@ export function App() {
                                 />
                             </Show>
                         </LineSeries>
-                    )}
+                    ) : undefined}
                 </Chart>
             </Show>
         </>

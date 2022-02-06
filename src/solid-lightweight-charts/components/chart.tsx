@@ -13,22 +13,29 @@ export function Chart(props: ChartProps): JSX.Element {
     const [, options] = splitProps(props, ['children']);
 
     return (
-        <div use:action={[
-            (element: HTMLElement, params: DeepPartial<ChartOptions>) => {
-                const subject = createChart(element, params);
-                setApi(subject);
-                return {
-                    update(nextParams: DeepPartial<ChartOptions>): void {
-                        subject.applyOptions(nextParams);
-                    },
-                    destroy(): void {
-                        subject.remove();
-                        setApi(null);
-                    }
-                };
-            },
-            options,
-        ]}>
+        <>
+            <div use:action={[
+                (element: HTMLElement, params: DeepPartial<ChartOptions>) => {
+                    const subject = createChart(element, params);
+                    setApi(subject);
+                    return {
+                        update(nextParams: DeepPartial<ChartOptions>): void {
+                            subject.applyOptions(nextParams);
+                        },
+                        destroy(): void {
+                            subject.remove();
+                            setApi(null);
+                        }
+                    };
+                },
+                options,
+            ]}/>
+            {/*
+                It is important to keep fake nodes as siblings of DIV
+                because of strange behaviour of solid with empty elements.
+
+                Solid will clean such nodes and kill manually inserted canvas.
+            */}
             <Show when={api()}>
             {(value: IChartApi) => (
                 <ApiProvider value={value}>
@@ -36,7 +43,7 @@ export function Chart(props: ChartProps): JSX.Element {
                 </ApiProvider>
             )}
             </Show>
-        </div>
+        </>
     );
 }
 
