@@ -87,11 +87,7 @@ module.exports = {
       'process.env': JSON.stringify(process.env),
     }),
     prod && new CleanWebpackPlugin(),
-    !prod && new ForkTsCheckerWebpackPlugin({
-      // eslint: {
-      //   files: './src/**/*.{tsx,ts}',
-      // },
-    }),
+    new ForkTsCheckerWebpackPlugin(),
   ].filter(Boolean),
 
   mode,
