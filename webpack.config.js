@@ -3,18 +3,12 @@ require('dotenv').config();
 const mode = process.env.NODE_ENV || 'development';
 const prod = mode !== 'development';
 
-const path = require('path');
-const md5 = require('md5');
-const getPath = relPath => path.resolve(__dirname, relPath);
-const getFilename = ({ type, chunk }) => (
-  `[name]${prod ? '.[contenthash:8]' : ''}${chunk ? '.chunk' : ''}.${type}`
-);
-
-const { DefinePlugin } = require('webpack');
+const {resolve} = require('path');
+const {DefinePlugin} = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 const cssLoaders = [
@@ -24,7 +18,6 @@ const cssLoaders = [
     options: {
       modules: {
         auto: true,
-        getLocalIdent: ({ resourcePath }, _, name) => `${name}-${md5(resourcePath).slice(0, 5)}`,
       },
     },
   },
@@ -33,19 +26,17 @@ const cssLoaders = [
 
 module.exports = {
   entry: {
-    bundle: getPath('src/index.tsx'),
+    bundle: './src/index.tsx',
   },
 
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
-    modules: [getPath('src'), 'node_modules'],
   },
 
   output: {
-    path: getPath('docs'),
-    filename: getFilename({ type: 'js' }),
-    chunkFilename: getFilename({ type: 'js', chunk: true }),
-    assetModuleFilename: '[name].[hash][ext]',
+    path: resolve(__dirname, 'docs'),
+    filename: '[name].js',
+    chunkFilename: '[name].[id].js'
   },
 
   module: {
@@ -68,13 +59,8 @@ module.exports = {
   },
 
   plugins: [
-    new HtmlWebpackPlugin({
-      template: getPath('public/index.html'),
-    }),
-    new MiniCssExtractPlugin({
-      filename: getFilename({ type: 'css' }),
-      chunkFilename: getFilename({ type: 'css', chunk: true }),
-    }),
+    new HtmlWebpackPlugin(),
+    new MiniCssExtractPlugin(),
     new DefinePlugin({
       'process.env': JSON.stringify(process.env),
     }),
@@ -83,7 +69,7 @@ module.exports = {
   ].filter(Boolean),
 
   mode,
-  devtool: prod ? false : 'source-map',
+  devtool: false,
 
   optimization: {
     minimize: prod,

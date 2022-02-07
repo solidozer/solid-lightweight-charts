@@ -2422,4 +2422,3 @@ function Dynamic(props) {
 /***/ })
 
 }]);
-//# sourceMappingURL=vendors.js.map
