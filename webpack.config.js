@@ -42,7 +42,7 @@ module.exports = {
   },
 
   output: {
-    path: getPath('build'),
+    path: getPath('docs'),
     filename: getFilename({ type: 'js' }),
     chunkFilename: getFilename({ type: 'js', chunk: true }),
     assetModuleFilename: 'static/media/[name].[hash][ext]',
