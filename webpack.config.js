@@ -7,7 +7,7 @@ const path = require('path');
 const md5 = require('md5');
 const getPath = relPath => path.resolve(__dirname, relPath);
 const getFilename = ({ type, chunk }) => (
-  `static/${type}/[name]${prod ? '.[contenthash:8]' : ''}${chunk ? '.chunk' : ''}.${type}`
+  `[name]${prod ? '.[contenthash:8]' : ''}${chunk ? '.chunk' : ''}.${type}`
 );
 
 const { DefinePlugin } = require('webpack');
@@ -18,7 +18,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 const cssLoaders = [
-  !prod ? 'style-loader' : MiniCssExtractPlugin.loader,
+  MiniCssExtractPlugin.loader,
   {
     loader: 'css-loader',
     options: {
@@ -45,7 +45,7 @@ module.exports = {
     path: getPath('docs'),
     filename: getFilename({ type: 'js' }),
     chunkFilename: getFilename({ type: 'js', chunk: true }),
-    assetModuleFilename: 'static/media/[name].[hash][ext]',
+    assetModuleFilename: '[name].[hash][ext]',
   },
 
   module: {
@@ -61,13 +61,6 @@ module.exports = {
         use: cssLoaders,
       },
       {
-        test: /\.s[ac]ss$/i,
-        use: [
-          ...cssLoaders,
-          'sass-loader',
-        ],
-      },
-      {
         test: /\.(png|svg|jpg|jpeg|gif)$/i,
         type: 'asset/resource',
       },
@@ -77,7 +70,6 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: getPath('public/index.html'),
-      publicPath: '/',
     }),
     new MiniCssExtractPlugin({
       filename: getFilename({ type: 'css' }),
